@@ -2,6 +2,17 @@ node_modules
 dist
 desktop
 .env
+.env.*
+*.env
+*.db
+*.db-*
+*.sqlite*
+*.key
+*.pem
+data
+browser_data
+backups
+.venv
 .git
 **/__pycache__
 **/*.pyc
