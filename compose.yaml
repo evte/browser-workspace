@@ -1,0 +1,21 @@
+services:
+  browser:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      ACCESS_PASSWORD: ${ACCESS_PASSWORD:?Set ACCESS_PASSWORD in .env}
+    volumes:
+      - browser_data:/data
+    cap_add:
+      - SYS_ADMIN
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    init: true
+    tmpfs:
+      - /run/browser-gateways:mode=0755,size=16m
+    shm_size: '1gb'
+    restart: unless-stopped
+volumes:
+  browser_data:

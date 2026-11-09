@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>环境管理 · Browser Workspace</title>
+  <link rel="stylesheet" href="/style.css?v=20261109-network2">
+  <script src="/app.js?v=20261109-network2" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">◈</span><span>Browser<span class="brand-muted"> Workspace</span></span></div>
+      <div class="sidebar-label">工作区</div>
+      <a class="nav-item" href="#environment-panel"><span>▦</span> 浏览器环境 <span class="nav-count" id="nav-count">0</span></a>
+      <a class="nav-item nav-secondary" href="#proxy-panel" data-manage><span>⇄</span> 代理管理 <span class="nav-count" id="proxy-nav-count">0</span></a>
+      <div class="sidebar-note"><div class="status-indicator"></div><div><strong>服务端运行</strong><p>浏览器环境保存在服务器</p></div></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div class="workspace-switch"><label class="sr-only" for="team-select">当前团队</label><select id="team-select" aria-label="当前团队"></select><button type="button" class="subtle" id="team-settings">团队成员</button><button type="button" class="subtle" id="new-team">＋ 团队</button><button type="button" class="subtle" id="join-team">加入团队</button></div><span class="topbar-end"><span id="current-user"></span><button type="button" class="subtle" id="logout">退出登录</button></span></header>
+      <div class="content">
+        <section class="page-heading">
+          <div><div class="eyebrow">BROWSER WORKSPACE</div><h1>浏览器环境</h1><p>管理独立环境，为每个环境指定访问网络。</p></div>
+          <button class="primary" id="new-profile" data-manage>＋ &nbsp;新建环境</button>
+        </section>
+        <section class="summary-row" aria-label="环境概览">
+          <div class="summary"><div class="summary-icon violet">▦</div><div><span id="visible-environments-label">团队环境</span><strong id="total-count">—</strong></div></div>
+          <div class="summary"><div class="summary-icon green">◉</div><div><span>运行中</span><strong id="running-count">—</strong></div></div>
+          <div class="summary summary-info" data-manage><div class="summary-icon blue">⇄</div><div><span>已导入代理</span><strong id="proxy-count">—</strong></div></div>
+        </section>
+        <section class="panel" id="environment-panel">
+          <div class="panel-header"><div><h2>环境列表 <span id="list-count" class="count-badge">0</span></h2><p>绑定代理的环境在代理失败后自动停止</p></div><button class="subtle" id="refresh" title="刷新环境列表">↻ <span>刷新</span></button></div>
+          <div id="message" role="status" aria-live="polite"></div>
+          <div class="list-toolbar">
+            <input type="search" id="profile-search" placeholder="搜索名称、标签、备注或代理" aria-label="搜索环境">
+            <select id="status-filter" aria-label="筛选环境状态"><option value="all">全部状态</option><option value="running">运行中</option><option value="downloading">下载内核</option><option value="starting">启动中</option><option value="stopped">已停止</option><option value="error">已中断</option></select><select id="tag-filter" aria-label="筛选标签"><option value="">全部标签</option></select><button type="button" class="subtle" id="batch-assign" data-manage disabled>分配环境 <span id="selected-count">0</span></button>
+          </div>
+          <div class="table-scroll environment-scroll">
+            <table class="compact-table environment-table" aria-label="浏览器环境列表">
+              <thead><tr><th scope="col" class="select-cell" data-manage><input type="checkbox" id="select-page" aria-label="选择当前页环境"></th><th scope="col" class="row-number">序号</th><th scope="col">环境名称</th><th scope="col" class="status-cell">状态</th><th scope="col">代理</th><th scope="col" class="totp-cell">2FA 验证码</th><th scope="col" class="assigned-cell">分配成员</th><th scope="col" class="actions-cell">操作</th></tr></thead>
+              <tbody id="profiles"><tr><td colspan="8" class="empty">正在加载环境…</td></tr></tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span id="page-summary" role="status"></span>
+            <div class="page-controls"><label for="page-size">每页</label><select id="page-size"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option></select><button id="page-prev" class="subtle" aria-label="上一页">‹</button><span id="page-number">1 / 1</span><button id="page-next" class="subtle" aria-label="下一页">›</button></div>
+          </div>
+        </section>
+        <section class="panel proxy-panel" id="proxy-panel" data-manage>
+          <div class="panel-header"><div><h2>代理管理 <span id="proxy-list-count" class="count-badge">0</span></h2><p>批量导入后，可在环境中选择并绑定</p></div><button class="subtle" id="import-proxies">＋ 批量导入</button></div>
+          <p id="proxy-notice" class="proxy-notice" role="status" aria-live="polite"></p>
+          <div class="table-scroll proxy-scroll"><table class="compact-table proxy-table" aria-label="代理列表"><thead><tr><th scope="col">协议</th><th scope="col">代理地址</th><th scope="col">认证</th></tr></thead><tbody id="proxies"><tr><td colspan="3" class="empty">正在加载代理…</td></tr></tbody></table></div>
+        </section>
+        <p class="footnote">浏览器和环境数据由服务器保存，连接后可在远程窗口中操作。</p>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="login-dialog">
+    <form id="login-form">
+      <div class="dialog-head"><div><div class="eyebrow">BROWSER WORKSPACE</div><h2 id="auth-title">登录工作区</h2><p id="auth-description">使用个人账号登录，进入你的团队。</p></div></div>
+      <div class="auth-tabs"><button type="button" id="auth-login" class="active">登录</button><button type="button" id="auth-register">注册账号</button></div>
+      <div id="register-name-field" hidden><label for="register-name">姓名 / 昵称</label><input id="register-name" maxlength="80" autocomplete="name"></div>
+      <label for="login-email">邮箱</label><input type="email" id="login-email" required maxlength="254" autocomplete="username">
+      <label for="login-password">密码</label><input type="password" id="login-password" required maxlength="128" autocomplete="current-password">
+      <p class="field-help" id="password-help" hidden>设置 12–128 个字符的密码。</p>
+      <div id="setup-key-field" hidden><label for="setup-key">服务器初始管理密码</label><input type="password" id="setup-key" autocomplete="off"><p class="field-help">首次注册需验证服务器管理密码。原有环境将归入首个账号的团队。</p></div>
+      <p id="auth-invite-notice" class="field-help" hidden>你有一个待接受的团队邀请，登录或注册后即可加入。</p>
+      <p id="login-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions"><button type="submit" class="primary" id="login-submit">登录</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="create-dialog" class="wide-dialog">
+    <form id="create-form">
+      <div class="dialog-head"><div><div class="eyebrow">NEW PROFILE</div><h2>新建浏览器环境</h2><p>可选择已有代理，或直接填写代理并自动关联。</p></div><button type="button" class="icon-button" data-close="create-dialog" aria-label="关闭">×</button></div>
+      <label for="profile-name">环境名称</label><input id="profile-name" name="name" placeholder="例如：工作账号" maxlength="100" required autocomplete="off">
+      <label for="profile-network-mode">访问网络</label><select id="profile-network-mode"><option value="direct">服务器网络（直连）</option><option value="existing">选择已有代理</option><option value="inline">直接填写代理</option></select>
+      <fieldset id="create-existing-proxy" class="plain-fieldset" hidden disabled>
+        <label for="profile-proxy">已有代理</label><select id="profile-proxy" name="proxy_id"><option value="">请选择已有代理</option></select>
+        <p class="field-help" id="profile-existing-help">从当前团队的代理中选择。</p>
+      </fieldset>
+      <fieldset id="create-inline-proxy" class="inline-proxy-fields" hidden disabled>
+        <legend>新代理</legend>
+        <div class="form-columns">
+          <div><label for="profile-inline-protocol">代理协议</label><select id="profile-inline-protocol"><option value="http">HTTP</option><option value="https">HTTPS</option><option value="socks5">SOCKS5</option><option value="socks4">SOCKS4</option></select></div>
+          <div><label for="profile-inline-format">代理格式</label><select id="profile-inline-format"><option value="host_port_auth">主机:端口:用户名:密码</option><option value="host_port">主机:端口</option><option value="auth_host_port">用户名:密码@主机:端口</option><option value="url">完整 URL</option></select></div>
+        </div>
+        <label for="profile-inline-text">代理地址</label><textarea id="profile-inline-text" rows="2" maxlength="2048" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="profile-inline-help profile-inline-save-help"></textarea>
+        <p class="field-help" id="profile-inline-help"></p>
+        <p class="field-help" id="profile-inline-save-help">创建环境时自动保存并关联代理；同团队已有相同代理时直接复用。</p>
+      </fieldset>
+      <p class="field-help">绑定代理后，代理失败将断开连接并停止环境。</p>
+      <label for="profile-kernel">浏览器内核</label><select id="profile-kernel" name="kernel_id"></select>
+      <p class="field-help" id="profile-kernel-help"></p>
+      <fieldset id="create-fingerprint" class="fingerprint-fields">
+        <legend>设备配置</legend>
+        <div class="form-columns">
+          <div><label for="profile-language">浏览器语言</label><input id="profile-language" required value="en-US" placeholder="例如：en-US" maxlength="35"></div>
+          <div><label for="profile-timezone">时区</label><input id="profile-timezone" required value="UTC" placeholder="例如：America/New_York" maxlength="100"></div>
+        </div>
+        <p class="field-help">创建时生成并保存固定设备种子，后续启动复用同一配置。</p>
+      </fieldset>
+      <label for="profile-totp-secret">2FA 密钥 <span>可选</span></label><input id="profile-totp-secret" type="password" autocomplete="off" spellcheck="false" maxlength="4096" placeholder="粘贴 Base32 密钥或 otpauth:// 链接" aria-describedby="profile-totp-help">
+      <p class="field-help" id="profile-totp-help">保存后在列表显示动态验证码。密钥只保存在服务器，获分配的成员可查看验证码。</p>
+      <label for="profile-tags">标签</label><input id="profile-tags" placeholder="用逗号分隔，例如：Facebook, 美国" maxlength="660">
+      <label for="profile-notes">备注</label><textarea id="profile-notes" class="notes-input" rows="3" maxlength="2000" placeholder="记录账号用途、注意事项等"></textarea>
+      <fieldset class="member-picker-field"><legend>分配给成员</legend><div id="create-assignees" class="member-picker"></div><p class="field-help">管理员始终可访问。普通成员只能访问分配给自己的环境。</p></fieldset>
+      <p id="form-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions"><button type="button" class="secondary" data-close="create-dialog">取消</button><button type="submit" class="primary" id="create-submit">创建环境</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="bind-dialog" class="wide-dialog">
+    <form id="bind-form">
+      <div class="dialog-head"><div><div class="eyebrow">PROFILE SETTINGS</div><h2>环境配置</h2><p id="bind-profile-name"></p></div><button type="button" class="icon-button" data-close="bind-dialog" aria-label="关闭">×</button></div>
+      <fieldset id="bind-manager-fields" class="plain-fieldset">
+      <label for="bind-name">环境名称</label><input id="bind-name" required maxlength="100">
+      <p class="field-help" id="bind-running-help" hidden>环境运行中，可修改 2FA、名称和分配信息；代理、内核及设备指纹需要停止后修改。</p>
+      <fieldset id="bind-engine-fields" class="plain-fieldset">
+      <label for="bind-proxy">访问网络</label><select id="bind-proxy"><option value="">服务器网络（直连）</option></select>
+      <p class="field-help">保存后下次启动生效。选择服务器网络会解除代理绑定。</p>
+      <label for="bind-kernel">浏览器内核</label><select id="bind-kernel"></select>
+      <p class="field-help" id="bind-kernel-help"></p>
+      <fieldset id="bind-fingerprint" class="fingerprint-fields">
+        <legend>设备指纹</legend>
+        <div class="form-columns">
+          <div><label for="bind-seed">固定设备种子</label><input id="bind-seed" readonly aria-describedby="seed-help"></div>
+          <div><label for="bind-platform">设备系统</label><select id="bind-platform"><option value="linux">Linux</option><option value="windows">Windows</option><option value="macos">macOS</option></select></div>
+        </div>
+        <p class="field-help" id="seed-help">设备种子随环境保存，重复启动保持一致。User-Agent 由内核版本和设备系统生成。</p>
+        <div class="form-columns">
+          <div><label for="bind-language">浏览器语言</label><input id="bind-language" required maxlength="35" placeholder="例如：en-US"></div>
+          <div><label for="bind-timezone">时区</label><input id="bind-timezone" required maxlength="100" placeholder="例如：America/New_York"></div>
+        </div>
+        <div class="form-columns">
+          <div><label for="bind-hardware">逻辑处理器数量</label><input id="bind-hardware" required type="number" min="1" max="128" step="1"></div>
+          <div><label for="bind-width">窗口宽度</label><input id="bind-width" required type="number" min="800" max="3840" step="1"></div>
+        </div>
+        <div class="form-columns">
+          <div><label for="bind-height">窗口高度</label><input id="bind-height" required type="number" min="600" max="2160" step="1"></div>
+        </div>
+      </fieldset>
+      </fieldset>
+      <div class="totp-settings">
+        <label for="bind-totp-secret">2FA 密钥 <span id="bind-totp-status">未设置</span></label><input id="bind-totp-secret" type="password" autocomplete="off" spellcheck="false" maxlength="4096" placeholder="粘贴 Base32 密钥或 otpauth:// 链接" aria-describedby="bind-totp-help">
+        <p class="field-help" id="bind-totp-help">密钥不回显，留空保留原密钥。保存新密钥后立即更新验证码。</p>
+        <label class="totp-remove" id="bind-totp-remove-field" hidden><input type="checkbox" id="bind-clear-totp">移除此环境的 2FA 密钥</label>
+      </div>
+      </fieldset>
+      <label for="bind-tags">标签</label><input id="bind-tags" placeholder="用逗号分隔，最多 20 个标签" maxlength="660">
+      <label for="bind-notes">备注</label><textarea id="bind-notes" class="notes-input" rows="3" maxlength="2000" placeholder="记录账号用途、注意事项等"></textarea>
+      <fieldset id="bind-assignment-field" class="member-picker-field"><legend>分配给成员</legend><div id="bind-assignees" class="member-picker"></div><p class="field-help">保存后立即更新成员访问权限。</p></fieldset>
+      <p id="bind-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions"><button type="button" class="secondary" data-close="bind-dialog">取消</button><button type="submit" class="primary" id="bind-submit">保存配置</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="import-dialog" class="wide-dialog">
+    <form id="import-form">
+      <div class="dialog-head"><div><div class="eyebrow">PROXY IMPORT</div><h2>批量导入代理</h2><p>每行一个代理，重复项会自动跳过。</p></div><button type="button" class="icon-button" data-close="import-dialog" aria-label="关闭">×</button></div>
+      <div class="form-columns">
+        <div><label for="proxy-protocol">代理协议</label><select id="proxy-protocol"><option value="http">HTTP</option><option value="https">HTTPS</option><option value="socks5">SOCKS5</option><option value="socks4">SOCKS4</option></select></div>
+        <div><label for="proxy-format">导入格式</label><select id="proxy-format"><option value="host_port">主机:端口</option><option value="host_port_auth">主机:端口:用户名:密码</option><option value="auth_host_port">用户名:密码@主机:端口</option><option value="url">完整代理 URL</option></select></div>
+      </div>
+      <p class="field-help" id="protocol-help"></p>
+      <label for="proxy-text">代理内容</label>
+      <textarea id="proxy-text" rows="7" required spellcheck="false" autocomplete="off" maxlength="1000000" aria-describedby="format-help"></textarea>
+      <p class="field-help" id="format-help"></p>
+      <label class="file-label" for="proxy-file">或读取文本文件 <span>UTF-8，最大 1 MB</span></label><input id="proxy-file" type="file" accept=".txt,.csv,text/plain,text/csv">
+      <p id="import-error" class="form-error multiline" role="alert"></p>
+      <div class="dialog-actions"><button type="button" class="secondary" data-close="import-dialog">取消</button><button type="submit" class="primary" id="import-submit">导入代理</button></div>
+    </form>
+  </dialog>
+  <dialog id="team-dialog" class="wide-dialog team-dialog">
+    <div class="dialog-body">
+      <div class="dialog-head"><div><div class="eyebrow">TEAM WORKSPACE</div><h2 id="team-dialog-name">团队成员</h2><p id="team-role-description"></p></div><button type="button" class="icon-button" data-close="team-dialog" aria-label="关闭">×</button></div>
+      <p id="team-error" class="form-error" role="alert"></p>
+      <div class="table-scroll"><table class="compact-table member-table"><thead><tr><th>成员</th><th>角色</th><th>操作</th></tr></thead><tbody id="team-members"></tbody></table></div>
+      <form id="invite-form" data-manage>
+        <h3>邀请成员</h3><div class="form-columns"><div><label for="invite-email">成员邮箱</label><input type="email" id="invite-email" required maxlength="254" placeholder="member@example.com"></div><div><label for="invite-role">团队角色</label><select id="invite-role"><option value="member">普通成员</option><option value="admin">管理员</option></select></div></div>
+        <p class="field-help">生成 7 天有效的一次性邀请链接，复制后发送给对应成员。</p>
+        <div class="dialog-actions"><button type="submit" class="primary" id="invite-submit">生成邀请链接</button></div>
+        <div id="invite-result" class="invite-result" hidden><label for="invite-link">邀请链接（仅显示一次，请及时复制）</label><input id="invite-link" readonly><button type="button" class="subtle" id="copy-invite">复制链接</button><p id="copy-invite-status" class="field-help" role="status"></p></div>
+      </form>
+      <section id="pending-invitations" data-manage><h3>待接受邀请</h3><div id="team-invitations"></div></section>
+    </div>
+  </dialog>
+  <dialog id="new-team-dialog"><form id="new-team-form"><div class="dialog-head"><div><h2>创建团队</h2><p>团队有独立的环境、代理和成员。</p></div><button type="button" class="icon-button" data-close="new-team-dialog" aria-label="关闭">×</button></div><label for="team-name">团队名称</label><input id="team-name" required maxlength="80" placeholder="例如：运营一组"><p id="new-team-error" class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="secondary" data-close="new-team-dialog">取消</button><button type="submit" class="primary" id="new-team-submit">创建团队</button></div></form></dialog>
+  <dialog id="join-team-dialog"><form id="join-team-form"><div class="dialog-head"><div><h2>加入团队</h2><p>使用邀请时指定的邮箱账号接受邀请。</p></div><button type="button" class="icon-button" data-close="join-team-dialog" aria-label="关闭">×</button></div><label for="join-token">邀请链接或令牌</label><input id="join-token" required autocomplete="off" placeholder="粘贴团队邀请链接"><p id="join-error" class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="secondary" data-close="join-team-dialog">取消</button><button type="submit" class="primary" id="join-submit">接受邀请</button></div></form></dialog>
+  <dialog id="assign-dialog"><form id="assign-form"><div class="dialog-head"><div><h2>分配环境</h2><p id="assignment-summary"></p></div><button type="button" class="icon-button" data-close="assign-dialog" aria-label="关闭">×</button></div><div id="batch-assignees" class="member-picker"></div><p class="field-help">将替换所选环境的成员分配；不选择成员即取消分配。管理员始终可以访问。</p><p id="assign-error" class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="secondary" data-close="assign-dialog">取消</button><button type="submit" class="primary" id="assign-submit">保存分配</button></div></form></dialog>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "browser-workspace-desktop",
+  "productName": "Browser Workspace",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Desktop client for server-hosted isolated browser environments",
+  "main": "desktop/main.cjs",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "start": "node desktop/dev.cjs",
+    "desktop": "node desktop/dev.cjs",
+    "test:desktop": "node --test desktop/tests/*.test.cjs",
+    "icons": "node desktop/build-icons.cjs",
+    "pack": "node desktop/package.cjs"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "45.2.3"
+  }
+}

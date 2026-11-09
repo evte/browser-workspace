@@ -1,0 +1,7 @@
+node_modules
+dist
+desktop
+.env
+.git
+**/__pycache__
+**/*.pyc

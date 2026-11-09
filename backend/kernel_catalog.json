@@ -1,0 +1,32 @@
+[
+  {
+    "id": "fingerprint-chromium-153-arm64",
+    "name": "指纹 Chromium 153 · ARM64",
+    "version": "153.0.8010.36",
+    "architecture": "arm64",
+    "engine": "fingerprint-chromium",
+    "platforms": ["linux"],
+    "supported_platforms": ["linux", "windows", "macos"],
+    "source": "babelcloud/fingerprint-chromium-arm64 · 社区移植",
+    "source_url": "https://github.com/babelcloud/fingerprint-chromium-arm64/releases/tag/v153.0.8010.36-1",
+    "url": "https://github.com/babelcloud/fingerprint-chromium-arm64/releases/download/v153.0.8010.36-1/ungoogled-chromium-153.0.8010.36-1-arm64_linux.tar.xz",
+    "sha256": "9b7260125d808d132ccb60ba5f81393c62c8df17d84aa7d13c6f5e5a1b75cd90",
+    "download_size": 146750952,
+    "executable": "ungoogled-chromium-153.0.8010.36-1-arm64_linux/chrome"
+  },
+  {
+    "id": "fingerprint-chromium-150-amd64",
+    "name": "指纹 Chromium 150 · AMD64",
+    "version": "150.0.7871.186",
+    "architecture": "amd64",
+    "engine": "fingerprint-chromium",
+    "platforms": ["linux"],
+    "supported_platforms": ["linux", "windows", "macos"],
+    "source": "adryfish/fingerprint-chromium",
+    "source_url": "https://github.com/adryfish/fingerprint-chromium/releases/tag/150.0.7871.186",
+    "url": "https://github.com/adryfish/fingerprint-chromium/releases/download/150.0.7871.186/ungoogled-chromium-150.0.7871.186-1-x86_64_linux.tar.xz",
+    "sha256": "48eff860053efd9ad498d51370f0a1f59f983df39c02a72ad2a8682cdead4055",
+    "download_size": 145806232,
+    "executable": "ungoogled-chromium-150.0.7871.186-1-x86_64_linux/chrome"
+  }
+]

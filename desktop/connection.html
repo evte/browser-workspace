@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>连接服务器 · Browser Workspace</title>
+  <link rel="stylesheet" href="connection.css">
+  <script src="connection.js" defer></script>
+</head>
+<body>
+  <main class="connection-shell">
+    <header class="brand"><span class="brand-mark" aria-hidden="true">◈</span><span>Browser <span class="brand-muted">Workspace</span></span><span class="desktop-badge">桌面版</span></header>
+    <section class="connection-card" aria-labelledby="connection-title">
+      <div class="eyebrow">DESKTOP WORKSPACE</div>
+      <h1 id="connection-title">连接你的工作区</h1>
+      <p class="intro">连接服务器后，登录账号即可管理浏览器环境、代理和团队。</p>
+      <form id="connection-form" novalidate>
+        <label for="server-url">服务器地址</label>
+        <input id="server-url" name="serverUrl" type="text" inputmode="url" value="http://127.0.0.1:8000" placeholder="https://browser.example.com" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="2048" aria-describedby="server-help" disabled>
+        <p id="server-help" class="field-help">本地预览先启动 Docker 服务；远程服务器请使用 HTTPS。</p>
+        <button id="connect-button" type="submit" disabled><span id="connect-label">连接工作区</span><span class="button-arrow" aria-hidden="true">→</span></button>
+        <div id="connection-status" class="connection-status" role="status" aria-live="polite" aria-atomic="true">正在读取连接设置…</div>
+      </form>
+      <div class="storage-note"><span class="storage-symbol" aria-hidden="true">▣</span><p><strong>环境数据留在服务器</strong><span>网站 Cookie 和浏览器环境文件保存在服务端。桌面端负责管理与远程操作。</span></p></div>
+    </section>
+    <footer><span>Browser Workspace · Electron</span><span id="app-version" aria-label="应用版本"></span></footer>
+  </main>
+</body>
+</html>
